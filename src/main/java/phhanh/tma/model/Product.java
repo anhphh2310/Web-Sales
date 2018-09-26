@@ -1,15 +1,19 @@
 package phhanh.tma.model;
 
-import java.sql.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "PRODUCT")
@@ -19,11 +23,11 @@ public class Product {
 	private int item;
 	private String classProduct;
 	private String inventory;
-	private Date createAt;
-	private Date modifiedAt;
-	private Set<Sales> sales;
+	private DateTime createAt;
+	private DateTime modifiedAt;
+	private Set<Sales> sales = new HashSet<Sales>(0);
 
-	public Product(int item, String classProduct, String inventory, Date createAt, Date modifiedAt) {
+	public Product(int item, String classProduct, String inventory, DateTime createAt, DateTime modifiedAt) {
 		super();
 		this.item = item;
 		this.classProduct = classProduct;
@@ -37,7 +41,11 @@ public class Product {
 	}
 
 	@Id
-	@GeneratedValue(generator = "UUID")
+	@GeneratedValue(generator="UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name = "PRODUCT_ID", updatable = false, nullable = false)
 	public UUID getProductId() {
 		return productId;
@@ -74,25 +82,25 @@ public class Product {
 		this.inventory = inventory;
 	}
 
-	@Column(name = "CREATE_aT")
-	public Date getCreateAt() {
+	@Column(name = "CREATE_AT")
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
-	@Column(name = "MODIFIED_aT")
-	public Date getModifiedAt() {
+	@Column(name = "MODIFIED_AT")
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Date modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 
-	@OneToMany(mappedBy="PRODUCT")
+	@OneToMany(fetch=FetchType.LAZY,mappedBy="product")
 	public Set<Sales> getSales() {
 		return sales;
 	}

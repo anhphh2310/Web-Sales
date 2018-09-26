@@ -1,17 +1,19 @@
 package phhanh.tma.model;
 
-import java.sql.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "TIME")
@@ -21,11 +23,11 @@ public class Time {
 	private int month;
 	private int quarter;
 	private int year;
-	private Date createAt;
-	private Date modifiedAt;
-	private Set<Sales> sales;
+	private DateTime createAt;
+	private DateTime modifiedAt;
+	private Set<Sales> sales = new HashSet<Sales>(0);
 	
-	public Time(int month, int quarter, int year, Date createAt, Date modifiedAt) {
+	public Time(int month, int quarter, int year, DateTime createAt, DateTime modifiedAt) {
 		super();
 		this.month = month;
 		this.quarter = quarter;
@@ -40,6 +42,10 @@ public class Time {
 
 	@Id
 	@GeneratedValue(generator="UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name="TIME_ID",nullable=false,updatable=false)
 	public UUID getTimeId() {
 		return timeId;
@@ -76,27 +82,25 @@ public class Time {
 		this.year = year;
 	}
 
-	@Temporal(TemporalType.DATE)
 	@Column(name="CREATE_AT")
-	public Date getCreateAt() {
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
 	@Column(name="MODIFIED_AT")
-	@Temporal(TemporalType.DATE)
-	public Date getModifiedAt() {
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Date modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 
-	@OneToMany(mappedBy="TIME")
+	@OneToMany(fetch=FetchType.LAZY,mappedBy="time")
 	public Set<Sales> getSales() {
 		return sales;
 	}

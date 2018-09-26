@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.GeneratedValue;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Embeddable
 public class SalesId implements Serializable{
@@ -28,6 +31,12 @@ public class SalesId implements Serializable{
 	public SalesId() {
 		super();
 	}
+	
+	@GeneratedValue(generator="UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name="PRODUCT_ID",nullable=false)
 	public UUID getProductId() {
 		return productId;
@@ -37,6 +46,11 @@ public class SalesId implements Serializable{
 		this.productId = productId;
 	}
 
+	@GeneratedValue(generator="UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name="TIME_ID", nullable=false)
 	public UUID getTimeId() {
 		return timeId;
@@ -46,6 +60,11 @@ public class SalesId implements Serializable{
 		this.timeId = timeId;
 	}
 
+	@GeneratedValue(generator="UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name="LOCATION_ID", nullable=false)
 	public UUID getLocationId() {
 		return locationId;

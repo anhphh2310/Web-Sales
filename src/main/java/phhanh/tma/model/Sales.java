@@ -1,7 +1,5 @@
 package phhanh.tma.model;
 
-import java.sql.Date;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -11,8 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "SALES")
@@ -23,10 +20,10 @@ public class Sales {
 	private Time time;
 	private Location location;
 	private double dollars;
-	private Date createAt;
-	private Date modifiedAt;
+	private DateTime createAt;
+	private DateTime modifiedAt;
 
-	public Sales(Product product, Time time, Location location, double dollars, Date createAt, Date modifiedAt) {
+	public Sales(Product product, Time time, Location location, double dollars, DateTime createAt, DateTime modifiedAt) {
 		super();
 		this.product = product;
 		this.time = time;
@@ -41,11 +38,11 @@ public class Sales {
 	}
 
 	@EmbeddedId
-	@AttributeOverrides({
-		@AttributeOverride(name="productId",column= @Column(name="PRODUCT_ID",nullable=false)),
-		@AttributeOverride(name="timeId",column = @Column(name="TIME_ID",nullable=false)),
-		@AttributeOverride(name="locationId",column = @Column(name="LOCATION_ID", nullable=false))
-	})
+//	@AttributeOverrides({
+//		@AttributeOverride(name="productId",column= @Column(name="PRODUCT_ID", nullable = false)),
+//		@AttributeOverride(name="timeId",column = @Column(name="TIME_ID", nullable = false)),
+//		@AttributeOverride(name="locationId",column = @Column(name="LOCATION_ID", nullable = false))
+//	})
 	public SalesId getSaleId() {
 		return saleId;
 	}
@@ -55,7 +52,7 @@ public class Sales {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="PRODUCT_ID")
+	@JoinColumn(name="PRODUCT_ID", updatable = false, nullable = false)
 	public Product getProduct() {
 		return product;
 	}
@@ -65,7 +62,7 @@ public class Sales {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="TIME_ID")
+	@JoinColumn(name="TIME_ID", updatable = false, nullable = false)
 	public Time getTime() {
 		return time;
 	}
@@ -75,7 +72,7 @@ public class Sales {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="LOCATION_ID")
+	@JoinColumn(name="LOCATION_ID", updatable = false, nullable = false)
 	public Location getLocation() {
 		return location;
 	}
@@ -94,22 +91,20 @@ public class Sales {
 	}
 
 	@Column(name="CREATE_AT")
-	@Temporal(TemporalType.DATE)
-	public Date getCreateAt() {
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
 	@Column(name="MODIFIED_AT")
-	@Temporal(TemporalType.DATE)
-	public Date getModifiedAt() {
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Date modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 

@@ -1,15 +1,19 @@
 package phhanh.tma.model;
 
-import java.sql.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "LOCATION")
@@ -18,11 +22,11 @@ public class Location {
 	private UUID locationId;
 	private String country;
 	private String city;
-	private Date createAt;
-	private Date modifiedAt;
-	private Set<Sales> sales;
+	private DateTime createAt;
+	private DateTime modifiedAt;
+	private Set<Sales> sales = new HashSet<Sales>(0);
 
-	public Location(String country, String city, Date createAt, Date modifiedAt) {
+	public Location(String country, String city, DateTime createAt, DateTime modifiedAt) {
 		super();
 		this.country = country;
 		this.city = city;
@@ -36,6 +40,10 @@ public class Location {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
+	@GenericGenerator(
+			name = "UUID",
+			strategy = "org.hibernate.id.UUIDGenerator"
+			)
 	@Column(name = "LOCATION_ID", updatable = false, nullable = false)
 	public UUID getLocationId() {
 		return locationId;
@@ -64,24 +72,24 @@ public class Location {
 	}
 
 	@Column(name = "CREATE_AT", nullable = true)
-	public Date getCreateAt() {
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
 	@Column(name = "MODIFIED_AT", nullable = true)
-	public Date getModifiedAt() {
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Date modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
-	
-	@OneToMany(mappedBy="LOCATION")
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
 	public Set<Sales> getSales() {
 		return sales;
 	}
@@ -89,7 +97,5 @@ public class Location {
 	public void setSales(Set<Sales> sales) {
 		this.sales = sales;
 	}
-	
-	
 
 }

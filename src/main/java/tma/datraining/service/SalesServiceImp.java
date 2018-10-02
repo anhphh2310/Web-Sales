@@ -36,7 +36,12 @@ public class SalesServiceImp implements SalesService{
 
 	@Override
 	public Sales get(UUID id) {
-		return salesRepo.findById(id).get();
+		Sales sales = null;
+		for (Sales sale : list()) {
+			if(sale.getSalesId().equals(id))
+				sales = sale;
+		}
+		return sales;
 	}
 
 	@Override

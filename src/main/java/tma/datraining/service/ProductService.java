@@ -17,4 +17,5 @@ public interface ProductService {
 	
 	void delete(UUID id);
 	
+	List<Product> findByClassProduct(String classProduct);
 }

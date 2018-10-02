@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import tma.datraining.dto.ProductDTO;
+import tma.datraining.exception.NotFoundDataException;
 import tma.datraining.model.Product;
 import tma.datraining.model.Sales;
 import tma.datraining.service.ProductService;
@@ -28,7 +29,7 @@ public class ProductController {
 
 	@Autowired
 	private SalesService salesSer;
-	
+
 	@RequestMapping(value = { "/products" }, method = RequestMethod.GET, produces = { "application/json",
 			"application/xml" })
 	@ResponseBody
@@ -40,8 +41,25 @@ public class ProductController {
 	@RequestMapping(value = { "/product/{productId}" }, method = RequestMethod.GET, produces = { "application/json",
 			"application/xml" })
 	@ResponseBody
-	public ProductDTO getProduct(@PathVariable("productId") UUID productId) {
-		ProductDTO pr = convertDTO(productSer.get(productId));
+	public ProductDTO getProduct(@PathVariable("productId") String productId) {
+		ProductDTO pro = null;
+		try {
+			pro = convertDTO(productSer.get(UUID.fromString(productId)));
+		} catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("No data found!");
+		}
+		return pro;
+
+	}
+
+	@RequestMapping(value = { "/product/class/{classProduct}" }, method = RequestMethod.GET, produces = {
+			"application/json", "application/xml" })
+	@ResponseBody
+	public List<ProductDTO> getProductByClass(@PathVariable("classProduct") String classProduct) {
+		List<Product> pro = productSer.findByClassProduct(classProduct);
+		System.out.println(pro.toString());
+		System.out.println(pro);
+		List<ProductDTO> pr = convertDTOList(pro);
 		return pr;
 
 	}
@@ -74,14 +92,22 @@ public class ProductController {
 	@RequestMapping(value = { "/product/{productId}" }, method = RequestMethod.DELETE, produces = { "application/json",
 			"application/xml" })
 	@ResponseBody
-	public void deleteProduct(@PathVariable("productId")UUID productId) {
-		productSer.delete(productId);
+	public void deleteProduct(@PathVariable("productId") String productId) {
+		ProductDTO pro = null;
+		try {
+			pro = convertDTO(productSer.get(UUID.fromString(productId)));
+		} catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("No data found!");
+		}
+		productSer.delete(pro.getProductId());
 		System.out.println("Delete product " + productId);
 	}
-	
-	
+
 	public ProductDTO convertDTO(Product product) {
 		ProductDTO temp = null;
+		if (product == null) {
+			throw new NotFoundDataException("No data found!");
+		}
 		temp = new ProductDTO(product.getProductId(), product.getItem(), product.getClassProduct(),
 				product.getInventory(), product.getCreateAt(), product.getModifiedAt());
 		return temp;
@@ -89,13 +115,17 @@ public class ProductController {
 
 	public List<ProductDTO> convertDTOList(List<Product> list) {
 		List<ProductDTO> list2 = new ArrayList<>();
+		if (list.size() == 0) {
+			throw new NotFoundDataException("");
+		}
 		list.forEach(e -> list2.add(convertDTO(e)));
 		return list2;
 	}
-	
+
 	public Product convertProduct(ProductDTO product) {
 		Product pro = null;
-		pro = new Product(product.getItem(), product.getClassProduct(), product.getInventory(), product.getCreateAt(), product.getModifiedAt());
+		pro = new Product(product.getItem(), product.getClassProduct(), product.getInventory(), product.getCreateAt(),
+				product.getModifiedAt());
 		pro.setProductId(product.getProductId());
 		return pro;
 	}

@@ -33,8 +33,12 @@ public class TimeServiceImp implements TimeService{
 
 	@Override
 	public Time get(UUID id) {
-		// TODO Auto-generated method stub
-		return timeRepository.findById(id).get();
+		Time time = null;
+		for (Time tim : list()) {
+			if(tim.getTimeId().equals(id))
+				time = tim;
+		}
+		return time;
 	}
 
 	@Override

@@ -27,7 +27,12 @@ public class LocationServiceImp implements LocationService{
 
 	@Override
 	public Location get(UUID id) {
-		return locationRepo.findById(id).get();
+		Location loca = null;
+		for (Location  location : list()) {
+			if(location.getLocationId().equals(id))
+				loca = location;
+		}
+		return loca;
 	}
 
 	@Override

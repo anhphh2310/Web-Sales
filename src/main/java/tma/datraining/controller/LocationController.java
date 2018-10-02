@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import tma.datraining.dto.LocationDTO;
+import tma.datraining.exception.NotFoundDataException;
 import tma.datraining.model.Location;
 import tma.datraining.model.Sales;
 import tma.datraining.service.LocationService;
@@ -41,8 +42,12 @@ public class LocationController {
 	@RequestMapping(value = { "/location/{locationId}" }, method = RequestMethod.GET, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public LocationDTO getLocation(@PathVariable("locationId") UUID locationId) {
-		LocationDTO loca = convertDTO(locaSer.get(locationId));
+	public LocationDTO getLocation(@PathVariable("locationId") String locationId) {
+		LocationDTO loca = null;
+		try{loca = convertDTO(locaSer.get(UUID.fromString(locationId)));}
+		catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
 		return loca;
 	}
 
@@ -70,13 +75,21 @@ public class LocationController {
 	@RequestMapping(value = { "/location/{locationId}" }, method = RequestMethod.DELETE, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public void deleteLocation(@PathVariable("locationId") UUID locationId) {
-		locaSer.delete(locationId);
+	public void deleteLocation(@PathVariable("locationId") String locationId) {
+		LocationDTO loca = null;
+		try{loca = convertDTO(locaSer.get(UUID.fromString(locationId)));}
+		catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
+		locaSer.delete(loca.getLocationId());
 		System.out.println("Delete location : " + locationId);
 	}
 
 	public LocationDTO convertDTO(Location location) {
 		LocationDTO temp = null;
+		if(location == null) {
+			throw new NotFoundDataException("");
+		}
 		temp = new LocationDTO(location.getLocationId(), location.getCountry(), location.getCity(),
 				location.getCreateAt(), location.getModifiedAt());
 		return temp;

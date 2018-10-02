@@ -34,7 +34,15 @@ public class ProductServiceImp implements ProductService{
 	@Override
 	public Product get(UUID id) {
 		// TODO Auto-generated method stub
-		return productRepo.findById(id).get();
+		Product pro = null;
+		List<Product> list = new ArrayList<>();
+		productRepo.findAll().forEach(e ->list.add(e));
+		for (Product product : list) {
+			if(product.getProductId().toString().equals(id.toString())) {
+				pro = product;
+			}
+		}
+		return pro;
 	}
 
 	@Override
@@ -47,6 +55,13 @@ public class ProductServiceImp implements ProductService{
 	public void delete(UUID id) {
 		// TODO Auto-generated method stub
 		productRepo.delete(productRepo.findById(id).get());
+	}
+
+	@Override
+	public List<Product> findByClassProduct(String classProduct) {
+		List<Product> list = null;
+		list = productRepo.findByClassProduct(classProduct);
+		return list;
 	}
 
 }

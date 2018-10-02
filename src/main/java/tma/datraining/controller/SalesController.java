@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import tma.datraining.dto.SalesDTO;
+import tma.datraining.exception.NotFoundDataException;
+import tma.datraining.model.Location;
+import tma.datraining.model.Product;
 import tma.datraining.model.Sales;
+import tma.datraining.model.Time;
 import tma.datraining.service.LocationService;
 import tma.datraining.service.ProductService;
 import tma.datraining.service.SalesService;
@@ -47,32 +51,56 @@ public class SalesController {
 	@RequestMapping(value = { "/sale/{salesId}" }, method = RequestMethod.GET, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public SalesDTO getSale(@PathVariable("salesId") UUID salesId) {
-		SalesDTO sales = convertDTO(salesSer.get(salesId));
+	public SalesDTO getSale(@PathVariable("salesId") String salesId) {
+		SalesDTO sales = null;
+		try{sales = convertDTO(salesSer.get(UUID.fromString(salesId)));}catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
 		return sales;
 	}
 	
 	@RequestMapping(value = { "/sale/product/{productId}" }, method = RequestMethod.GET, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public List<SalesDTO> getSaleByProduct(@PathVariable("productId") UUID productId) {
-		List<SalesDTO> sales = convertDTOList(salesSer.findByProduct(proSer.get(productId)));
+	public List<SalesDTO> getSaleByProduct(@PathVariable("productId") String productId) {
+		Product pro = null;
+		try{pro = proSer.get(UUID.fromString(productId));}catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
+		if(pro == null) {
+			throw new NotFoundDataException("");
+		}
+		List<SalesDTO> sales = convertDTOList(salesSer.findByProduct(pro));
 		return sales;
 	}
 	
 	@RequestMapping(value = { "/sale/location/{locationId}" }, method = RequestMethod.GET, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public List<SalesDTO> getSaleByLocation(@PathVariable("locationId") UUID locationId) {
-		List<SalesDTO> sales = convertDTOList(salesSer.findByLocation(locaSer.get(locationId)));
+	public List<SalesDTO> getSaleByLocation(@PathVariable("locationId") String locationId) {
+		Location location = null;
+		try{location = locaSer.get(UUID.fromString(locationId));}catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
+		if(location == null) {
+			throw new NotFoundDataException("");
+		}
+		List<SalesDTO> sales = convertDTOList(salesSer.findByLocation(location));
 		return sales;
 	}
 	
 	@RequestMapping(value = { "/sale/time/{timeId}" }, method = RequestMethod.GET, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public List<SalesDTO> getSaleByTime(@PathVariable("timeId") UUID timeId) {
-		List<SalesDTO> sales = convertDTOList(salesSer.findByTime(timeSer.get(timeId)));
+	public List<SalesDTO> getSaleByTime(@PathVariable("timeId") String timeId) {
+		Time time = null;
+		try{time = timeSer.get(UUID.fromString(timeId));}catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
+		if(time == null) {
+			throw new NotFoundDataException("");
+		}
+		List<SalesDTO> sales = convertDTOList(salesSer.findByTime(time));
 		return sales;
 	}
 
@@ -88,8 +116,12 @@ public class SalesController {
 	@RequestMapping(value = { "/sale/{salesId}" }, method = RequestMethod.DELETE, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
-	public void deleteSales(@PathVariable("salesId") UUID salesId) {
-		salesSer.delete(salesId);
+	public void deleteSales(@PathVariable("salesId") String salesId) {
+		SalesDTO sales = null;
+		try{sales = convertDTO(salesSer.get(UUID.fromString(salesId)));}catch (IllegalArgumentException e) {
+			throw new NotFoundDataException("");
+		}
+		salesSer.delete(sales.getSalesId());
 		System.out.println("Delete sale : " + salesId);
 	}
 

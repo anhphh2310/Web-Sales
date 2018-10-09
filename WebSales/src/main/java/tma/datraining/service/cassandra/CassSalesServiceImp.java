@@ -6,13 +6,11 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tma.datraining.model.cassandra.CassSales;
 import tma.datraining.repository.cassandra.CassSalesRepo;
 
 @Service
-@Transactional
 public class CassSalesServiceImp implements CassSalesService {
 
 	@Autowired

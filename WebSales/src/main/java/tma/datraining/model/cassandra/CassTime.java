@@ -1,15 +1,15 @@
 package tma.datraining.model.cassandra;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-import com.datastax.driver.core.DataType.Name;
+import com.datastax.driver.core.DataType;
 
 @Table("time")
 public class CassTime {
@@ -18,25 +18,21 @@ public class CassTime {
 	private int month;
 	private int quarter;
 	private int year;
-	private Timestamp createAt;
-	private Timestamp modifiedAt;
+	private DateTime createAt;
+	private DateTime modifiedAt;
 
-	public CassTime(UUID timeId, int month, int quarter, int year, Timestamp createAt, Timestamp modifiedAt) {
+	public CassTime(UUID timeId, int month, int quarter, int year) {
 		super();
 		this.timeId = timeId;
 		this.month = month;
 		this.quarter = quarter;
 		this.year = year;
-		this.createAt = createAt;
-		this.modifiedAt = modifiedAt;
+		this.createAt = new DateTime(DateTimeZone.forID("Asia/Saigon"));
+		this.modifiedAt = new DateTime(DateTimeZone.forID("Asia/Saigon"));
 	}
 
-	public CassTime() {
-		super();
-	}
-
-	@PrimaryKeyColumn(name="time_id",type=PrimaryKeyType.PARTITIONED,ordinal=1)
-	@CassandraType(type=Name.UUID)
+	@PrimaryKey
+	@CassandraType(type=DataType.Name.UUID)
 	public UUID getTimeId() {
 		return timeId;
 	}
@@ -73,30 +69,21 @@ public class CassTime {
 	}
 
 	@Column(value="create_at")
-	@CassandraType(type=Name.TIMESTAMP)
-	public Timestamp getCreateAt() {
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Timestamp createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
 	@Column(value="modified_at")
-	@CassandraType(type=Name.TIMESTAMP)
-	public Timestamp getModifiedAt() {
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Timestamp modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 
-	@Override
-	public String toString() {
-		return "CassTime [timeId=" + timeId + ", month=" + month + ", quarter=" + quarter + ", year=" + year
-				+ ", createAt=" + createAt + ", modifiedAt=" + modifiedAt + "]";
-	}
-
-	
 }

@@ -8,21 +8,28 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import tma.datraining.converter.DateTimeToTimestampConverter;
 import tma.datraining.dto.TimeDTO;
 import tma.datraining.exception.NotFoundDataException;
 import tma.datraining.model.Sales;
 import tma.datraining.model.Time;
+import tma.datraining.model.cassandra.CassTime;
 import tma.datraining.service.SalesService;
 import tma.datraining.service.TimeService;
+import tma.datraining.service.cassandra.CassTimeService;
 
 @RestController
+@RequestMapping("/time")
 public class TimeController {
 
 	@Autowired
@@ -31,15 +38,33 @@ public class TimeController {
 	@Autowired
 	private SalesService salesSer;
 
-	@RequestMapping(value = { "/times" }, method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_VALUE,
+	@Autowired
+	private CassTimeService cassSer;
+	
+	@Autowired
+	private DateTimeToTimestampConverter converter;
+	
+	
+	@GetMapping(value="/convert",produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
+	@ResponseBody
+	public List<TimeDTO> getConvertTime(){
+		List<TimeDTO> list = new ArrayList<>();
+		cassSer.list().forEach(e -> list.add(convertCassToDTO(e)));
+		list.forEach(e -> timeSer.save(converTime(e)));
+		return list;
+	}
+	
+	@GetMapping(value = { "/list" }, produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
 	public List<TimeDTO> getTimes() {
-		List<TimeDTO> list = convertDTOList(timeSer.list());
+		List<TimeDTO> list = new ArrayList<>();
+		timeSer.list().forEach(e->list.add(convertDTO(e)));
 		return list;
 	}
 
-	@RequestMapping(value = { "/time/{timId}" }, method = RequestMethod.GET, produces = {
+	@GetMapping(value = { "/{timeId}" }, produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
 	public TimeDTO getTime(@PathVariable("timeId") String timeId) {
@@ -53,7 +78,7 @@ public class TimeController {
 		return time;
 	}
 
-	@RequestMapping(value = { "/time" }, method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE,
+	@PostMapping(value = { "/time" },produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
 	public TimeDTO saveTime(@RequestBody TimeDTO tim) {
@@ -62,7 +87,7 @@ public class TimeController {
 		return tim;
 	}
 
-	@RequestMapping(value = { "/time/{timeId}" }, method = RequestMethod.PUT, produces = { MediaType.APPLICATION_JSON_VALUE,
+	@PutMapping(value = { "/time/{timeId}" }, produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
 	public TimeDTO updateTime(@RequestBody TimeDTO tim,@PathVariable("timeId")String timeId) {
@@ -85,7 +110,7 @@ public class TimeController {
 		return timeDTO;
 	}
 
-	@RequestMapping(value = { "/time/{timeId}" }, method = RequestMethod.DELETE, produces = {
+	@DeleteMapping(value = { "/time/{timeId}" },  produces = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseBody
 	public void deleteTime(@PathVariable("timeId") String timeId) {
@@ -99,26 +124,42 @@ public class TimeController {
 		System.out.println("Delete time : " + timeId);
 	}
 
-	public TimeDTO convertDTO(Time time) {
-		TimeDTO temp = null;
-		if (time == null) {
+	//Convert
+	//Time to DTO
+	public TimeDTO convertDTO(Time e) {
+		TimeDTO time = new TimeDTO();
+		if (e == null) {
 			throw new NotFoundDataException("");
 		}
-		temp = new TimeDTO(time.getTimeId(), time.getMonth(), time.getQuarter(), time.getYear(), time.getCreateAt(),
-				time.getModifiedAt());
-		return temp;
+		time.setTimeId(e.getTimeId());
+		time.setMonth(e.getMonth());
+		time.setQuarter(e.getQuarter());
+		time.setYear(e.getYear());
+		time.setCreateAt((e.getCreateAt()));
+		time.setModifiedAt(e.getModifiedAt());
+		return time;
 	}
 
-	public List<TimeDTO> convertDTOList(List<Time> list) {
-		List<TimeDTO> list2 = new ArrayList<>();
-		list.forEach(e -> list2.add(convertDTO(e)));
-		return list2;
-	}
-
+	//DTO to time
 	public Time converTime(TimeDTO time) {
 		Time tim = null;
 		tim = new Time(time.getMonth(), time.getQuarter(), time.getYear(), time.getCreateAt(), time.getModifiedAt());
 		tim.setTimeId(time.getTimeId());
 		return tim;
+	}
+	
+	//Cass to DTO
+	private TimeDTO convertCassToDTO(CassTime e) {
+		if(e== null) {
+			throw new NotFoundDataException("");
+		}
+		TimeDTO time = new TimeDTO();
+		time.setTimeId(e.getTimeId());
+		time.setMonth(e.getMonth());
+		time.setQuarter(e.getQuarter());
+		time.setYear(e.getYear());
+		time.setCreateAt(converter.convert(e.getCreateAt()));
+		time.setModifiedAt(converter.convert(e.getModifiedAt()));
+		return time;
 	}
 }

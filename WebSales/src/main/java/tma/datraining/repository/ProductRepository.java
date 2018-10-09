@@ -1,5 +1,6 @@
 package tma.datraining.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,4 +11,5 @@ import tma.datraining.model.Product;
 public interface ProductRepository extends CrudRepository<Product, UUID>{
 
 	List<Product> findByClassProduct(String classProduct);
+	
 }

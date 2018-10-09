@@ -39,7 +39,6 @@ public class Location {
 	}
 
 	@Id
-	@GeneratedValue
 	@Column(name="location_id")
 	public UUID getLocationId() {
 		return locationId;

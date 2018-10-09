@@ -43,7 +43,6 @@ public class Time {
 
 
 	@Id
-	@GeneratedValue
 	@Column(name="time_id", nullable=false, insertable=false)
 	public UUID getTimeId() {
 		return timeId;

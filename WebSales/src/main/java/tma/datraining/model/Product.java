@@ -41,7 +41,6 @@ public class Product {
 	}
 
 	@Id
-	@GeneratedValue
 	@Column(name="product_id",nullable=false, insertable=false)
 	public UUID getProductId() {
 		return productId;

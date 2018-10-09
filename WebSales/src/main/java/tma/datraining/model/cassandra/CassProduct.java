@@ -1,15 +1,15 @@
 package tma.datraining.model.cassandra;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
-import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-import com.datastax.driver.core.DataType.Name;
+import com.datastax.driver.core.DataType;
 
 @Table("product")
 public class CassProduct {
@@ -18,26 +18,21 @@ public class CassProduct {
 	private int item;
 	private String classProduct;
 	private String inventory;
-	private Timestamp createAt;
-	private Timestamp modifiedAt;
+	private DateTime createAt;
+	private DateTime modifiedAt;
 
-	public CassProduct(UUID productId, int item, String classProduct, String inventory, Timestamp createAt,
-			Timestamp modifiedAt) {
+	public CassProduct(UUID productId, int item, String classProduct, String inventory) {
 		super();
 		this.productId = productId;
 		this.item = item;
 		this.classProduct = classProduct;
 		this.inventory = inventory;
-		this.createAt = createAt;
-		this.modifiedAt = modifiedAt;
+		this.createAt = new DateTime(DateTimeZone.forID("Asia/Saigon"));
+		this.modifiedAt = new DateTime(DateTimeZone.forID("Asia/Saigon"));
 	}
 
-	public CassProduct() {
-		super();
-	}
-
-	@PrimaryKeyColumn(name="product_id",type=PrimaryKeyType.PARTITIONED,ordinal=1)
-	@CassandraType(type=Name.UUID)
+	@PrimaryKey(value="product_id")
+	@CassandraType(type=DataType.Name.UUID)
 	public UUID getProductId() {
 		return productId;
 	}
@@ -74,29 +69,21 @@ public class CassProduct {
 	}
 
 	@Column(value="create_at")
-	@CassandraType(type=Name.TIMESTAMP)
-	public Timestamp getCreateAt() {
+	public DateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Timestamp createAt) {
+	public void setCreateAt(DateTime createAt) {
 		this.createAt = createAt;
 	}
 
 	@Column(value="modified_at")
-	@CassandraType(type=Name.TIMESTAMP)
-	public Timestamp getModifiedAt() {
+	public DateTime getModifiedAt() {
 		return modifiedAt;
 	}
 
-	public void setModifiedAt(Timestamp modifiedAt) {
+	public void setModifiedAt(DateTime modifiedAt) {
 		this.modifiedAt = modifiedAt;
-	}
-
-	@Override
-	public String toString() {
-		return "CassProduct [productId=" + productId + ", item=" + item + ", classProduct=" + classProduct
-				+ ", inventory=" + inventory + ", createAt=" + createAt + ", modifiedAt=" + modifiedAt + "]";
 	}
 
 }

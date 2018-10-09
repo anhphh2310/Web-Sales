@@ -6,18 +6,16 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tma.datraining.model.cassandra.CassTime;
 import tma.datraining.repository.cassandra.CassTimeRepo;
 
 @Service
-@Transactional
 public class CassTimeServiceImp implements CassTimeService {
 
 	@Autowired
 	private CassTimeRepo cassRepo;
-	
+
 	@Override
 	public List<CassTime> list() {
 		List<CassTime> list = new ArrayList<>();
